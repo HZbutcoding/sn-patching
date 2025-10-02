@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/HZbutcoding/sn-patching/compare/v1.0.4...v1.1.0) (2025-10-02)
+
+
+### Features
+
+* yeah ([c9b2258](https://github.com/HZbutcoding/sn-patching/commit/c9b225891a8ce4ebf7e05b24d137a6355b6467cc))
+
 ## [1.0.4](https://github.com/ReVanced/revanced-patches-template/compare/v1.0.3...v1.0.4) (2024-11-05)
 
 ## [1.0.4-dev.2](https://github.com/ReVanced/revanced-patches-template/compare/v1.0.4-dev.1...v1.0.4-dev.2) (2024-11-05)
