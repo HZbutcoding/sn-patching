@@ -10,7 +10,6 @@ val figureFiltersInitFingerprint = fingerprint {
     parameters()
     // The method we’re after has many `INVOKE_DIRECT` and `INVOKE_VIRTUAL`
     // calls for LabelInputIncrementField and LabelColorInputIncrementField
-    // yes
     opcodes(
         Opcode.NEW_INSTANCE,
         Opcode.INVOKE_DIRECT,

@@ -4,7 +4,7 @@ patches {
     about {
         name = "Stick Nodes Filter Addition"
         description = "an attempt to add more filters"
-        source = "git@github.com/HZbutcoding/sn-patching.git"
+        source = "https://github.com/HZbutcoding/sn-patching"
         author = "ReVanced + HZ"
         contact = "HZbutcoding"
         website = "https://revanced.app"
@@ -25,5 +25,3 @@ if (localProperties.exists()) {
         project.extra[key.trim()] = value.trim()
     }
 }
-
-//yup

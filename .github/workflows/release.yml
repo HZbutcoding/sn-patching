@@ -14,6 +14,7 @@ jobs:
       contents: write
       packages: write
     runs-on: ubuntu-latest
+    environment: main
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -35,7 +36,7 @@ jobs:
       - name: Build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew build
+        run: ./gradlew build clean
 
 
       - name: Setup Node.js
@@ -52,7 +53,8 @@ jobs:
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.GPG_PASSPHRASE }}
-          fingerprint: ${{ vars.GPG_FINGERPRINT }}
+#          fingerprint: ${{ vars.GPG_FINGERPRINT }}
+
 
       - name: Release
         env:
