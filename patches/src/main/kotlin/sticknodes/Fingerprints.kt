@@ -6,18 +6,19 @@ import com.android.tools.smali.dexlib2.Opcode
 
 val figureFiltersInitFingerprint = fingerprint {
     accessFlags(AccessFlags.PUBLIC)
-    returns("V") // constructor/initializer methods are void
-    parameters()
-    // The method we’re after has many `INVOKE_DIRECT` and `INVOKE_VIRTUAL`
-    // calls for LabelInputIncrementField and LabelColorInputIncrementField
+    returns("V")
+    parameters("Lcom/badlogic/gdx/graphics/g2d/TextureAtlas;", "Lcom/badlogic/gdx/graphics/g2d/TextureAtlas;", "Lcom/badlogic/gdx/scenes/scene2d/utils/Drawable")
     opcodes(
         Opcode.NEW_INSTANCE,
         Opcode.INVOKE_DIRECT,
         Opcode.IPUT_OBJECT,
-        Opcode.INVOKE_VIRTUAL
+        Opcode.INVOKE_VIRTUAL,
+        Opcode.IF_LT
     )
     custom { method, classDef ->
         classDef.type == "Lorg/fortheloss/sticknodes/animationscreen/modules/tooltables/FigureFiltersToolTable;" &&
-                method.name == "<init>" // constructor is where UI widgets are built
+                method.name == "initialize"
     }
 }
+
+

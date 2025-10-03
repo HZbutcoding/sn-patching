@@ -1,6 +1,5 @@
 public final class com/HZ/CustomFilters/CustomFiltersKt {
 	public static final fun getAddCustomFilterSlot ()Lapp/revanced/patcher/patch/BytecodePatch;
-	public static final fun getCustomFilterFingerprint ()Lapp/revanced/patcher/Fingerprint;
 }
 
 public final class com/HZ/CustomFilters/FingerprintsKt {
