@@ -24,6 +24,7 @@ val AddCustomFilterSlot = bytecodePatch(
     // inside your bytecodePatch { execute { ... } } block
 
     execute {
+
         val figureFilterInit = figureFiltersInitFingerprint.patternMatch!!.endIndex;
         figureFiltersInitFingerprint.method.addInstruction(0,
             """
