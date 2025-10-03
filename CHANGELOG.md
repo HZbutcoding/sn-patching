@@ -1,3 +1,10 @@
+# [1.9.0](https://github.com/HZbutcoding/sn-patching/compare/v1.8.0...v1.9.0) (2025-10-03)
+
+
+### Features
+
+* attempt number 2 ([17320e9](https://github.com/HZbutcoding/sn-patching/commit/17320e9a4a25393454e5bbbf69f120c9f44cacfd))
+
 # [1.8.0](https://github.com/HZbutcoding/sn-patching/compare/v1.7.0...v1.8.0) (2025-10-03)
 
 
