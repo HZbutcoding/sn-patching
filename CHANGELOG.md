@@ -1,8 +1,37 @@
-# [1.1.0](https://github.com/HZbutcoding/sn-patching/compare/v1.0.4...v1.1.0) (2025-10-02)
+# [1.1.0](https://github.com/HZbutcoding/sn-patching/compare/v1.0.4...v1.1.0) (2025-10-03)
 
 
 ### Features
 
+* first attempt at an actual extra slot ([e6aeaec](https://github.com/HZbutcoding/sn-patching/commit/e6aeaecf925b97a5eb0ad9d12102bfa49ff1711d))
+* first attempt at an actual extra slot (2) ([72598c6](https://github.com/HZbutcoding/sn-patching/commit/72598c630c4ab7886fd5b9b3dcc0c42f58305434))
+* forgor patch ([36df052](https://github.com/HZbutcoding/sn-patching/commit/36df052c5a5d3ea7c27327b480de1954ec2ab323))
+* yeah ([c9b2258](https://github.com/HZbutcoding/sn-patching/commit/c9b225891a8ce4ebf7e05b24d137a6355b6467cc))
+
+# [1.1.0](https://github.com/HZbutcoding/sn-patching/compare/v1.0.4...v1.1.0) (2025-10-03)
+
+
+### Features
+
+* first attempt at an actual extra slot ([e6aeaec](https://github.com/HZbutcoding/sn-patching/commit/e6aeaecf925b97a5eb0ad9d12102bfa49ff1711d))
+* first attempt at an actual extra slot (2) ([72598c6](https://github.com/HZbutcoding/sn-patching/commit/72598c630c4ab7886fd5b9b3dcc0c42f58305434))
+* yeah ([c9b2258](https://github.com/HZbutcoding/sn-patching/commit/c9b225891a8ce4ebf7e05b24d137a6355b6467cc))
+
+# [1.1.0](https://github.com/HZbutcoding/sn-patching/compare/v1.0.4...v1.1.0) (2025-10-03)
+
+
+### Features
+
+* first attempt at an actual extra slot ([e6aeaec](https://github.com/HZbutcoding/sn-patching/commit/e6aeaecf925b97a5eb0ad9d12102bfa49ff1711d))
+* first attempt at an actual extra slot (2) ([72598c6](https://github.com/HZbutcoding/sn-patching/commit/72598c630c4ab7886fd5b9b3dcc0c42f58305434))
+* yeah ([c9b2258](https://github.com/HZbutcoding/sn-patching/commit/c9b225891a8ce4ebf7e05b24d137a6355b6467cc))
+
+# [1.1.0](https://github.com/HZbutcoding/sn-patching/compare/v1.0.4...v1.1.0) (2025-10-03)
+
+
+### Features
+
+* first attempt at an actual extra slot ([e6aeaec](https://github.com/HZbutcoding/sn-patching/commit/e6aeaecf925b97a5eb0ad9d12102bfa49ff1711d))
 * yeah ([c9b2258](https://github.com/HZbutcoding/sn-patching/commit/c9b225891a8ce4ebf7e05b24d137a6355b6467cc))
 
 ## [1.0.4](https://github.com/ReVanced/revanced-patches-template/compare/v1.0.3...v1.0.4) (2024-11-05)
