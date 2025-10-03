@@ -1,3 +1,11 @@
+# [1.2.0](https://github.com/HZbutcoding/sn-patching/compare/v1.1.0...v1.2.0) (2025-10-03)
+
+
+### Features
+
+* fixed merge ([a7d4871](https://github.com/HZbutcoding/sn-patching/commit/a7d487104c8513119403d25cdde1bbb2fe388f02))
+* fixed merge ([b8727d5](https://github.com/HZbutcoding/sn-patching/commit/b8727d5fc6bda35dea6f024b35e1ccd2f8814a0a))
+
 # [1.1.0](https://github.com/HZbutcoding/sn-patching/compare/v1.0.4...v1.1.0) (2025-10-03)
 
 
