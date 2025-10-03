@@ -9,13 +9,16 @@ import com.android.tools.smali.dexlib2.Opcode
 
 val figureFiltersInitFingerprint = fingerprint {
     custom { _, classDef ->
+        println("Checking class: ${classDef.type}")
         if (classDef.type.endsWith("FigureFiltersToolTable;")) {
             println("== Methods in ${classDef.type} ==")
             classDef.methods.forEach { method ->
                 println("  ${method.name}(${method.parameterTypes.joinToString()}) -> ${method.returnType}")
             }
             true
-        } else false
+        } else {
+            false
+        }
     }
 }
 
