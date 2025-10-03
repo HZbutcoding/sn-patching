@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/HZbutcoding/sn-patching/compare/v1.3.0...v1.4.0) (2025-10-03)
+
+
+### Features
+
+* fixed pathing: missing Opcode ([2de70d9](https://github.com/HZbutcoding/sn-patching/commit/2de70d9c44b7f706d846918d4355b489367cfc0c))
+
 # [1.3.0](https://github.com/HZbutcoding/sn-patching/compare/v1.2.0...v1.3.0) (2025-10-03)
 
 
