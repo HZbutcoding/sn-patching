@@ -8,15 +8,21 @@ import com.android.tools.smali.dexlib2.Opcode
 
 
 val figureFiltersInitFingerprint = fingerprint {
-    accessFlags(AccessFlags.PUBLIC)
-    returns("V") // change as appropriate
-    parameters("Lcom/badlogic/gdx/graphics/g2d/TextureAtlas;", "Lcom/badlogic/gdx/graphics/g2d/TextureAtlas;", "Lcom/badlogic/gdx/scenes/scene2d/utils/Drawable;")
-    custom { method, classDef ->
-        classDef.type == "Lorg/fortheloss/sticknodes/animationscreen/modules/tooltables/FigureFiltersToolTable;" &&
-                method.name == "initialize" // change to actual method name
+
+
+    custom { _, classDef ->
+        println("Checking class: ${classDef.type}")
+        if (classDef.type.endsWith("FigureFiltersToolTable;")) {
+            println("== Methods in ${classDef.type} ==")
+            classDef.methods.forEach { method ->
+                println("  ${method.name}(${method.parameterTypes.joinToString()}) -> ${method.returnType}")
+            }
+            true
+        } else {
+            false
+        }
     }
 }
-
 
 
 

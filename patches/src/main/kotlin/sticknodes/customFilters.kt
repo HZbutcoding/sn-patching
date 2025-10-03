@@ -27,12 +27,20 @@ val AddCustomFilterSlot = bytecodePatch(
 
 
 
-        val match = figureFiltersInitFingerprint.patternMatch!!.startIndex;
-        figureFiltersInitFingerprint.method.addInstruction(0,
-            """
+        execute {
+            val match = figureFiltersInitFingerprint.patternMatch
+                ?: throw RuntimeException("Could not match FigureFiltersToolTable init")
+
+            // Now you can access match.method safely
+            val targetMethod = figureFiltersInitFingerprint.method
+            println("Matched method: ${targetMethod.name}")
+
+            targetMethod.addInstruction(0,
+                """
             invoke-static {p0}, Lapp/revanced/extension/customfilters/TintFieldHook;->installTintField(Ljava/lang/Object;)V
-            """.trimIndent()
-        )
+        """.trimIndent()
+            )
+        }
 
 
 
