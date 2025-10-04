@@ -24,19 +24,25 @@ val AddCustomFilterSlot = bytecodePatch(
     // inside your bytecodePatch { execute { ... } } block
 
     execute {
+        println("🚀 [CustomFilterPatch] execute() is running")
 
+        val match = figureFiltersInitFingerprint.patternMatch
+            ?: throw RuntimeException("Could not match FigureFiltersToolTable init")
 
+        println("✅ [CustomFilterPatch] Found match at index ${match.startIndex}")
 
-        execute {
-            val match = figureFiltersInitFingerprint.patternMatch!!.startIndex;
+        val targetMethod = figureFiltersInitFingerprint.method
+        println("✅ [CustomFilterPatch] Modifying method: ${targetMethod.name}")
 
-            figureFiltersInitFingerprint.method.addInstruction(match + 201,
-                """
-            invoke-static {p0}, Lapp/revanced/extension/customfilters/TintFieldHook;->installTintField(Ljava/lang/Object;)V
+        targetMethod.addInstruction(
+            match.startIndex + 3, // or another index you’re testing
+            """
+        invoke-static {p0}, Lapp/revanced/extension/customfilters/TintFieldHook;->installTintField(Ljava/lang/Object;)V
         """.trimIndent()
-            )
-        }
+        )
 
+        println("✅ [CustomFilterPatch] Instruction added successfully")
+    }
 
 
 
@@ -51,6 +57,6 @@ val AddCustomFilterSlot = bytecodePatch(
 //            """.trimIndent()
 //
 //        )
-        }
+
 
     }
