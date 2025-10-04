@@ -1,16 +1,17 @@
 package com.HZ.CustomFilters
 
-import app.revanced.patcher.fingerprint
+
+
+import app.revanced.patcher.extensions.InstructionExtensions.addInstructions
 import app.revanced.patcher.patch.bytecodePatch
 import app.revanced.patcher.extensions.InstructionExtensions.addInstruction
-import app.revanced.patcher.extensions.InstructionExtensions.addInstructions
 
 
 
 @Suppress("unused")
 val AddCustomFilterSlot = bytecodePatch(
     name = "Custom Filter slot",
-    description = "Adds a placeholder slot for now (debugging stage)"
+    description = "Adds a placeholder slot for now (debugging stage 2)"
 ) {
     compatibleWith(
         "org.fortheloss.sticknodes"("4.2.5"),
@@ -24,39 +25,30 @@ val AddCustomFilterSlot = bytecodePatch(
     // inside your bytecodePatch { execute { ... } } block
 
     execute {
-        println("🚀 [CustomFilterPatch] execute() is running")
-
-        val match = figureFiltersInitFingerprint.patternMatch
-            ?: throw RuntimeException("Could not match FigureFiltersToolTable init")
-
-        println("✅ [CustomFilterPatch] Found match at index ${match.startIndex}")
+        println("[CustomFilterPatch] execute() is running")
 
         val targetMethod = figureFiltersInitFingerprint.method
-        println("✅ [CustomFilterPatch] Modifying method: ${targetMethod.name}")
+            ?: throw RuntimeException("Could not find FigureFiltersToolTable.initialize()")
 
+        val impl = targetMethod.implementation ?: throw RuntimeException("No implementation found")
+        val registerCount = impl.registerCount
+        val parameterCount = targetMethod.parameterTypes.size + 1 // +1 for "this"
+        val thisRegister = registerCount - parameterCount // vXX that represents "this"
+
+        println("Matched method: ${targetMethod.name}")
+        println("Registers in ${targetMethod.name}: $registerCount")
+        println("Resolved 'this' (p0) as v$thisRegister")
+
+        // inject using resolved vXX instead of p0
         targetMethod.addInstruction(
-            match.startIndex + 3, // or another index you’re testing
+            0,
             """
-        invoke-static {p0}, Lapp/revanced/extension/customfilters/TintFieldHook;->installTintField(Ljava/lang/Object;)V
+        # copy 'this' into a low-numbered register
+        move-object v0, p0
+        invoke-static {v0}, Lapp/revanced/extension/customfilters/TintFieldHook;->installTintField(Ljava/lang/Object;)V
         """.trimIndent()
         )
 
-        println("✅ [CustomFilterPatch] Instruction added successfully")
+        println("✅ Injection added successfully at register v$thisRegister")
     }
-
-
-
-
-
-
-
-//        val figureFilterInit = figureFiltersInitFingerprint.patternMatch!!.endIndex;
-//        figureFiltersInitFingerprint.method.addInstruction(0,
-//            """
-//                invoke-static {p0}, Lapp/revanced/extension/customfilters/TintFieldHook;->installTintField(Ljava/lang/Object;)V
-//            """.trimIndent()
-//
-//        )
-
-
-    }
+}
