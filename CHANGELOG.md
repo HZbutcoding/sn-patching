@@ -1,3 +1,10 @@
+# [1.10.0](https://github.com/HZbutcoding/sn-patching/compare/v1.9.0...v1.10.0) (2025-10-04)
+
+
+### Features
+
+* added popup notif to confirm patching ([b401cbe](https://github.com/HZbutcoding/sn-patching/commit/b401cbe0613e9f83af5a053a498a29e805341ff7))
+
 # [1.9.0](https://github.com/HZbutcoding/sn-patching/compare/v1.8.0...v1.9.0) (2025-10-03)
 
 
