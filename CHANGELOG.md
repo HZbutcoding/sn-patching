@@ -1,3 +1,10 @@
+# [1.11.0](https://github.com/HZbutcoding/sn-patching/compare/v1.10.0...v1.11.0) (2025-10-04)
+
+
+### Features
+
+* added logger ([821cfd8](https://github.com/HZbutcoding/sn-patching/commit/821cfd8678cf000f223487001d59ef7cada2b4ba))
+
 # [1.10.0](https://github.com/HZbutcoding/sn-patching/compare/v1.9.0...v1.10.0) (2025-10-04)
 
 
