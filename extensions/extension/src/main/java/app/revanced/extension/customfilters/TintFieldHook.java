@@ -1,11 +1,19 @@
 package app.revanced.extension.customfilters;
 
+import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
+import android.widget.Toast;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 public class TintFieldHook {
     public static void installTintField(Object table) {
         try {
+            // Try to show a toast first — to confirm the hook actually runs
+            showToast("Custom filter hook triggered ✅");
+
             ClassLoader cl = table.getClass().getClassLoader();
 
             Class<?> appClass = Class.forName("org.fortheloss.sticknodes.App", false, cl);
@@ -39,8 +47,38 @@ public class TintFieldHook {
             Method setValue = labelFieldClass.getMethod("setValue", colorClass);
             setValue.invoke(field, whiteColor);
 
+            System.out.println("[CustomFilters] Tint field added successfully!");
+
         } catch (Throwable t) {
             t.printStackTrace();
+            showToast("❌ Custom filter hook failed: " + t.getClass().getSimpleName());
+        }
+    }
+
+    // Show Toast using main thread
+    private static void showToast(String message) {
+        try {
+            Context context = getAppContext();
+            if (context == null) {
+                System.out.println("[CustomFilters] No context available for Toast");
+                return;
+            }
+
+            new Handler(Looper.getMainLooper()).post(() ->
+                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+            );
+        } catch (Throwable ignored) {
+        }
+    }
+
+    // Universal app context getter
+    private static Context getAppContext() {
+        try {
+            Class<?> activityThread = Class.forName("android.app.ActivityThread");
+            Object currentActivityThread = activityThread.getMethod("currentActivityThread").invoke(null);
+            return (Context) activityThread.getMethod("getApplication").invoke(currentActivityThread);
+        } catch (Throwable ignored) {
+            return null;
         }
     }
 }
