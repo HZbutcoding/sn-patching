@@ -1,3 +1,10 @@
+# [1.14.0](https://github.com/HZbutcoding/sn-patching/compare/v1.13.0...v1.14.0) (2025-10-04)
+
+
+### Features
+
+* fixed a dumb mistake ([5cdb677](https://github.com/HZbutcoding/sn-patching/commit/5cdb6770c0167e84a06f5557d744376121ea43dd))
+
 # [1.13.0](https://github.com/HZbutcoding/sn-patching/compare/v1.12.0...v1.13.0) (2025-10-04)
 
 
