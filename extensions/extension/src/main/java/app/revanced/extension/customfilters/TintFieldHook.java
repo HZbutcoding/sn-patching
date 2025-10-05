@@ -107,11 +107,16 @@ public class TintFieldHook {
             // ========================================
             Log.i(TAG, "Getting localized label...");
 
-            Class<?> appClass = Class.forName("org.fortheloss.sticknodes.App", false, cl);
-            Method localize = appClass.getMethod("localize", String.class);
-            String labelText = (String) localize.invoke(null, "tint"); // Use "tint" key
 
+            // Use hardcoded text instead of localization
+            String labelText = "Custom"; // or whatever name you want
             Log.i(TAG, "✓ Label text: " + labelText);
+
+//            Class<?> appClass = Class.forName("org.fortheloss.sticknodes.App", false, cl);
+//            Method localize = appClass.getMethod("localize", String.class);
+//            String labelText = (String) localize.invoke(null, "tint"); // Use "tint" key
+//
+//            Log.i(TAG, "✓ Label text: " + labelText);
 
             // ========================================
             // Step 4: Create LabelColorInputIncrementField instance
@@ -182,7 +187,7 @@ public class TintFieldHook {
             Log.i(TAG, "✓ Field configured (high fidelity, white color)");
 
             // ========================================
-            // Step 7: Add to mFiltersSubTable
+            // Step 7: Add to mFiltersSubTable with proper row management
             // ========================================
             Log.i(TAG, "Adding to filters table...");
 
@@ -190,60 +195,86 @@ public class TintFieldHook {
             filtersSubTableField.setAccessible(true);
             Object filtersSubTable = filtersSubTableField.get(table);
 
-// FIX: Try different method signatures for Table.add
-            Method tableAdd = null;
-            try {
-                // First try: add(Actor)
-                tableAdd = tableClass.getMethod("add", actorClass);
-                Log.i(TAG, "✓ Found Table.add(Actor) method");
-            } catch (NoSuchMethodException e) {
-                Log.w(TAG, "✗ Table.add(Actor) not found, trying alternatives...");
+// Add to table and get Cell
+            Method tableAdd = tableClass.getMethod("add", actorClass);
+            Object cell = tableAdd.invoke(filtersSubTable, fieldInstance);
 
-                // Try: add(Actor) with getDeclaredMethod
-                try {
-                    tableAdd = tableClass.getDeclaredMethod("add", actorClass);
-                    tableAdd.setAccessible(true);
-                    Log.i(TAG, "✓ Found Table.add(Actor) via getDeclaredMethod");
-                } catch (NoSuchMethodException e2) {
-                    Log.w(TAG, "✗ Table.add(Actor) not found with getDeclaredMethod");
+// Configure Cell layout EXACTLY like the original code
+            Method fillX = cellClass.getMethod("fillX");
+            Object cellAfterFillX = fillX.invoke(cell);
 
-                    // Last resort: Try to find any add method that takes one parameter
-                    Method[] methods = tableClass.getMethods();
-                    for (Method method : methods) {
-                        if (method.getName().equals("add") && method.getParameterTypes().length == 1) {
-                            tableAdd = method;
-                            Log.i(TAG, "✓ Found compatible Table.add method: " + method);
-                            break;
-                        }
-                    }
-                }
-            }
+            Method colspan = cellClass.getMethod("colspan", int.class);
+            colspan.invoke(cellAfterFillX, 2); // colspan(2)
 
-            if (tableAdd != null) {
-                Object cell = tableAdd.invoke(filtersSubTable, fieldInstance);
-                Log.i(TAG, "✓ Field added to table, got cell: " + (cell != null ? cell.getClass().getSimpleName() : "null"));
+// NOW call row() after cell configuration (matching smali pattern)
+            Method tableRow = tableClass.getMethod("row");
+            tableRow.invoke(filtersSubTable);
 
-                // Configure Cell layout: colspan(2).fillX()
-                try {
-                    Method colspan = cellClass.getMethod("colspan", int.class);
-                    Object cellAfterColspan = colspan.invoke(cell, 2);
+            Log.i(TAG, "✓ Added to filters table (matched original pattern)");
 
-                    Method fillX = cellClass.getMethod("fillX");
-                    fillX.invoke(cellAfterColspan);
 
-                    Log.i(TAG, "✓ Cell configured (colspan=2, fillX)");
-                } catch (NoSuchMethodException e) {
-                    Log.w(TAG, "Could not configure Cell layout: " + e.getMessage());
-                }
 
-                // Add row separator
-                Method tableRow = tableClass.getMethod("row");
-                tableRow.invoke(filtersSubTable);
 
-                Log.i(TAG, "✓ Added to filters table");
-            } else {
-                throw new NoSuchMethodException("Could not find Table.add method with any signature");
-            }
+//            Log.i(TAG, "Adding to filters table...");
+//
+//            Field filtersSubTableField = figureFiltersClass.getDeclaredField("mFiltersSubTable");
+//            filtersSubTableField.setAccessible(true);
+//            Object filtersSubTable = filtersSubTableField.get(table);
+//
+//// FIX: Try different method signatures for Table.add
+//            Method tableAdd = null;
+//            try {
+//                // First try: add(Actor)
+//                tableAdd = tableClass.getMethod("add", actorClass);
+//                Log.i(TAG, "✓ Found Table.add(Actor) method");
+//            } catch (NoSuchMethodException e) {
+//                Log.w(TAG, "✗ Table.add(Actor) not found, trying alternatives...");
+//
+//                // Try: add(Actor) with getDeclaredMethod
+//                try {
+//                    tableAdd = tableClass.getDeclaredMethod("add", actorClass);
+//                    tableAdd.setAccessible(true);
+//                    Log.i(TAG, "✓ Found Table.add(Actor) via getDeclaredMethod");
+//                } catch (NoSuchMethodException e2) {
+//                    Log.w(TAG, "✗ Table.add(Actor) not found with getDeclaredMethod");
+//
+//                    // Last resort: Try to find any add method that takes one parameter
+//                    Method[] methods = tableClass.getMethods();
+//                    for (Method method : methods) {
+//                        if (method.getName().equals("add") && method.getParameterTypes().length == 1) {
+//                            tableAdd = method;
+//                            Log.i(TAG, "✓ Found compatible Table.add method: " + method);
+//                            break;
+//                        }
+//                    }
+//                }
+//            }
+//
+//            if (tableAdd != null) {
+//                Object cell = tableAdd.invoke(filtersSubTable, fieldInstance);
+//                Log.i(TAG, "✓ Field added to table, got cell: " + (cell != null ? cell.getClass().getSimpleName() : "null"));
+//
+//                // Configure Cell layout: colspan(2).fillX()
+//                try {
+//                    Method colspan = cellClass.getMethod("colspan", int.class);
+//                    Object cellAfterColspan = colspan.invoke(cell, 2);
+//
+//                    Method fillX = cellClass.getMethod("fillX");
+//                    fillX.invoke(cellAfterColspan);
+//
+//                    Log.i(TAG, "✓ Cell configured (colspan=2, fillX)");
+//                } catch (NoSuchMethodException e) {
+//                    Log.w(TAG, "Could not configure Cell layout: " + e.getMessage());
+//                }
+//
+//                // Add row separator
+//                Method tableRow = tableClass.getMethod("row");
+//                tableRow.invoke(filtersSubTable);
+//
+//                Log.i(TAG, "✓ Added to filters table");
+//            } else {
+//                throw new NoSuchMethodException("Could not find Table.add method with any signature");
+//            }
 
             // ========================================
             // Step 8: Create and set field listener
@@ -424,391 +455,3 @@ public class TintFieldHook {
         }
     }
 }
-
-
-//**
-// * Hook class that adds a custom tint filter field to FigureFiltersToolTable
-// * Injected via Revanced Patcher into initialize() method
-// */
-//public class TintFieldHook {
-//    private static final String TAG = "CustomFilterHook";
-//    private static boolean installed = false;
-//
-//    /**
-//     * Schedule a safe install after initialization.
-//     * Call this from your smali injection.
-//     */
-//    public static void scheduleInstall(final Object toolTable) {
-//        if (installed) {
-//            Log.w(TAG, "Already installed, skipping");
-//            return;
-//        }
-//        installed = true;
-//
-//        Log.i(TAG, "=== scheduleInstall() called ===");
-//        Log.i(TAG, "Thread: " + Thread.currentThread().getName());
-//        Log.i(TAG, "Table class: " + (toolTable != null ? toolTable.getClass().getName() : "NULL"));
-//
-//        // Ensure this runs on the main thread after a short delay
-//        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                installCustomTintSlot(toolTable);
-//            }
-//        }, 500);
-//    }
-//
-//    /**
-//     * Main installation method - creates and adds the custom tint filter slot
-//     */
-//    public static void installCustomTintSlot(Object table) {
-//        Log.i(TAG, "=== installCustomTintSlot() starting ===");
-//
-//        try {
-//            ClassLoader cl = table.getClass().getClassLoader();
-//            if (cl == null) {
-//                Log.e(TAG, "ClassLoader is null!");
-//                return;
-//            }
-//
-//            // ========================================
-//            // Step 1: Load all required classes
-//            // ========================================
-//            Log.i(TAG, "Loading classes...");
-//
-//            Class<?> figureFiltersClass = Class.forName(
-//                    "org.fortheloss.sticknodes.animationscreen.modules.tooltables.FigureFiltersToolTable",
-//                    false, cl
-//            );
-//            Class<?> labelColorInputClass = Class.forName(
-//                    "org.fortheloss.framework.LabelColorInputIncrementField",
-//                    false, cl
-//            );
-//            Class<?> animationScreenClass = Class.forName(
-//                    "org.fortheloss.sticknodes.animationscreen.AnimationScreen",
-//                    false, cl
-//            );
-//            Class<?> colorClass = Class.forName(
-//                    "com.badlogic.gdx.graphics.Color",
-//                    false, cl
-//            );
-//            Class<?> tableClass = Class.forName(
-//                    "com.badlogic.gdx.scenes.scene2d.ui.Table",
-//                    false, cl
-//            );
-//            Class<?> cellClass = Class.forName(
-//                    "com.badlogic.gdx.scenes.scene2d.ui.Cell",
-//                    false, cl
-//            );
-//
-//            Log.i(TAG, "✓ All classes loaded successfully");
-//
-//            // ========================================
-//            // Step 2: Get AnimationScreen context
-//            // ========================================
-//            Log.i(TAG, "Getting AnimationScreen context...");
-//
-//            Method getModule = figureFiltersClass.getMethod("getModule");
-//            Object module = getModule.invoke(table);
-//
-//            Method getContext = module.getClass().getMethod("getContext");
-//            Object animationScreen = getContext.invoke(module);
-//
-//            Log.i(TAG, "✓ AnimationScreen context retrieved: " + animationScreen.getClass().getName());
-//
-//            // ========================================
-//            // Step 3: Get localized label text
-//            // ========================================
-//            Log.i(TAG, "Getting localized label...");
-//
-//            Class<?> appClass = Class.forName("org.fortheloss.sticknodes.App", false, cl);
-//            Method localize = appClass.getMethod("localize", String.class);
-//            String labelText = (String) localize.invoke(null, "tint"); // Use "tint" key
-//
-//            Log.i(TAG, "✓ Label text: " + labelText);
-//
-//            // ========================================
-//            // Step 4: Create LabelColorInputIncrementField instance
-//            // ========================================
-//            Log.i(TAG, "Creating field instance...");
-//
-//            // Constructor signature: <init>(AnimationScreen, String, String, I, F, F, Z)
-//            Constructor<?> ctor = labelColorInputClass.getDeclaredConstructor(
-//                    animationScreenClass,
-//                    String.class,    // label text
-//                    String.class,    // default string
-//                    int.class,       // precision
-//                    float.class,     // min
-//                    float.class,     // max
-//                    boolean.class    // boolean flag
-//            );
-//            ctor.setAccessible(true);
-//
-//            // Create instance with parameters:
-//            // - animationScreen: context
-//            // - labelText: localized "tint"
-//            // - "0.00": default value string
-//            // - 4: precision (decimal places)
-//            // - 0.0f: minimum value
-//            // - 1.0f: maximum value
-//            // - true: boolean flag (exact purpose varies, typically "enabled")
-//            Object fieldInstance = ctor.newInstance(
-//                    animationScreen,
-//                    labelText,
-//                    "0.00",
-//                    4,
-//                    0.0f,
-//                    1.0f,
-//                    true
-//            );
-//
-//            Log.i(TAG, "✓ Field instance created");
-//
-//            // ========================================
-//            // Step 5: Register the widget with ID 108
-//            // ========================================
-//            Log.i(TAG, "Registering widget...");
-//
-//            try {
-//                // Load the Actor class
-//                Class<?> actorClass = Class.forName("com.badlogic.gdx.scenes.scene2d.Actor", false, cl);
-//
-//                // Get the correct registerWidget method signature
-//                Method registerWidget = figureFiltersClass.getMethod("registerWidget", actorClass, int.class);
-//                registerWidget.invoke(table, fieldInstance, 108); // ID 108 (0x6C)
-//
-//                Log.i(TAG, "✓ Widget registered with ID 108");
-//            } catch (Exception e) {
-//                Log.e(TAG, "✗ Failed to register widget", e);
-//                throw e; // Re-throw to see the exact error
-//            }
-//
-//            // ========================================
-//            // Step 6: Configure field properties
-//            // ========================================
-//            Log.i(TAG, "Configuring field properties...");
-//
-//            // Set high fidelity mode
-//            Method setHigh = labelColorInputClass.getMethod("setHighFidelity", boolean.class);
-//            setHigh.invoke(fieldInstance, true);
-//
-//            // Set initial value to WHITE
-//            Field whiteField = colorClass.getField("WHITE");
-//            Object whiteColor = whiteField.get(null);
-//            Method setValue = labelColorInputClass.getMethod("setValue", colorClass);
-//            setValue.invoke(fieldInstance, whiteColor);
-//
-//            Log.i(TAG, "✓ Field configured (high fidelity, white color)");
-//
-//            // ========================================
-//            // Step 7: Add to mFiltersSubTable
-//            // ========================================
-//            Log.i(TAG, "Adding to filters table...");
-//
-//            Field filtersSubTableField = figureFiltersClass.getDeclaredField("mFiltersSubTable");
-//            filtersSubTableField.setAccessible(true);
-//            Object filtersSubTable = filtersSubTableField.get(table);
-//
-//            // Add to table and get Cell
-//            Method tableAdd = tableClass.getMethod("add", Object.class);
-//            Object cell = tableAdd.invoke(filtersSubTable, fieldInstance);
-//
-//            // Configure Cell layout: colspan(2).fillX()
-//            try {
-//                Method colspan = cellClass.getMethod("colspan", int.class);
-//                Object cellAfterColspan = colspan.invoke(cell, 2);
-//
-//                Method fillX = cellClass.getMethod("fillX");
-//                fillX.invoke(cellAfterColspan);
-//
-//                Log.i(TAG, "✓ Cell configured (colspan=2, fillX)");
-//            } catch (NoSuchMethodException e) {
-//                Log.w(TAG, "Could not configure Cell layout: " + e.getMessage());
-//            }
-//
-//            // Add row separator
-//            Method tableRow = tableClass.getMethod("row");
-//            tableRow.invoke(filtersSubTable);
-//
-//            Log.i(TAG, "✓ Added to filters table");
-//
-//            // ========================================
-//            // Step 8: Create and set field listener
-//            // ========================================
-//            Log.i(TAG, "Creating field listener...");
-//
-//            Class<?> listenerInterface = Class.forName(
-//                    "org.fortheloss.framework.LabelColorInputIncrementField$ColorFieldListener",
-//                    false, cl
-//            );
-//
-//            Object listenerProxy = createFieldListener(
-//                    cl,
-//                    listenerInterface,
-//                    table,
-//                    figureFiltersClass,
-//                    colorClass
-//            );
-//
-//            // Set the listener
-//            Class<?> baseFieldListenerClass = Class.forName(
-//                    "org.fortheloss.framework.LabelInputIncrementField$FieldListener",
-//                    false, cl
-//            );
-//            Method setFieldListener = labelColorInputClass.getMethod("setFieldListener", baseFieldListenerClass);
-//            setFieldListener.invoke(fieldInstance, listenerProxy);
-//
-//            Log.i(TAG, "✓ Field listener attached");
-//
-//            // ========================================
-//            // Step 9: Success!
-//            // ========================================
-//            Log.i(TAG, "=== Custom tint filter installed successfully! ===");
-//
-//            // Show toast notification
-//            showToast(animationScreen, "Custom tint filter added!");
-//
-//        } catch (Throwable t) {
-//            Log.e(TAG, "Failed to install custom tint slot", t);
-//            t.printStackTrace();
-//        }
-//    }
-//
-//    /**
-//     * Creates a dynamic proxy for the ColorFieldListener interface
-//     */
-//    private static Object createFieldListener(
-//            ClassLoader cl,
-//            Class<?> listenerInterface,
-//            Object table,
-//            Class<?> figureFiltersClass,
-//            Class<?> colorClass
-//    ) throws Exception {
-//
-//        return Proxy.newProxyInstance(
-//                cl,
-//                new Class<?>[]{listenerInterface},
-//                new InvocationHandler() {
-//                    // Cache reflective lookups for performance
-//                    Method redrawModuleMethod = null;
-//                    Field animationBasedModuleRefField = null;
-//                    Method setAmountMethod = null;
-//                    Method setColorMethod = null;
-//
-//                    {
-//                        try {
-//                            // Get redrawModule() method
-//                            redrawModuleMethod = figureFiltersClass.getMethod("redrawModule");
-//                            Log.i(TAG, "  ✓ Found redrawModule()");
-//                        } catch (Exception e) {
-//                            Log.w(TAG, "  ✗ Could not find redrawModule(): " + e.getMessage());
-//                        }
-//
-//                        try {
-//                            // Get animation module reference field
-//                            animationBasedModuleRefField = figureFiltersClass.getDeclaredField("mAnimationBasedModuleRef");
-//                            animationBasedModuleRefField.setAccessible(true);
-//
-//                            Class<?> animBasedModuleClass = animationBasedModuleRefField.getType();
-//
-//                            // Get methods on animation module
-//                            try {
-//                                setAmountMethod = animBasedModuleClass.getMethod("setFigureTintAmountTo", float.class);
-//                                Log.i(TAG, "  ✓ Found setFigureTintAmountTo()");
-//                            } catch (NoSuchMethodException e) {
-//                                Log.w(TAG, "  ✗ Could not find setFigureTintAmountTo()");
-//                            }
-//
-//                            try {
-//                                setColorMethod = animBasedModuleClass.getMethod("setFigureTintColor", colorClass);
-//                                Log.i(TAG, "  ✓ Found setFigureTintColor()");
-//                            } catch (NoSuchMethodException e) {
-//                                Log.w(TAG, "  ✗ Could not find setFigureTintColor()");
-//                            }
-//                        } catch (Exception e) {
-//                            Log.w(TAG, "  ✗ Could not access animation module: " + e.getMessage());
-//                        }
-//                    }
-//
-//                    @Override
-//                    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-//                        String methodName = method.getName();
-//
-//                        try {
-//                            if ("onTextFieldTouchEvent".equals(methodName)) {
-//                                // User touched the field - redraw module
-//                                Log.d(TAG, "Listener: onTextFieldTouchEvent");
-//                                if (redrawModuleMethod != null) {
-//                                    redrawModuleMethod.invoke(table);
-//                                }
-//                                return null;
-//
-//                            } else if ("onTextFieldChange".equals(methodName)) {
-//                                // Value changed: args[0] = float value, args[1] = boolean isFinal
-//                                float value = ((Number) args[0]).floatValue();
-//                                boolean isFinal = args.length > 1 ? (Boolean) args[1] : false;
-//
-//                                Log.d(TAG, "Listener: onTextFieldChange value=" + value + " final=" + isFinal);
-//
-//                                // Redraw module
-//                                if (redrawModuleMethod != null) {
-//                                    redrawModuleMethod.invoke(table);
-//                                }
-//
-//                                // Set tint amount on animation module
-//                                if (animationBasedModuleRefField != null && setAmountMethod != null) {
-//                                    Object animRef = animationBasedModuleRefField.get(table);
-//                                    if (animRef != null) {
-//                                        setAmountMethod.invoke(animRef, value);
-//                                    }
-//                                }
-//                                return null;
-//
-//                            } else if ("onColorChange".equals(methodName)) {
-//                                // Color changed: args[0] = Color
-//                                Object colorArg = args[0];
-//
-//                                Log.d(TAG, "Listener: onColorChange color=" + colorArg);
-//
-//                                // Set tint color on animation module
-//                                if (animationBasedModuleRefField != null && setColorMethod != null && colorArg != null) {
-//                                    Object animRef = animationBasedModuleRefField.get(table);
-//                                    if (animRef != null) {
-//                                        setColorMethod.invoke(animRef, colorArg);
-//                                    }
-//                                }
-//                                return null;
-//                            }
-//                        } catch (Throwable t) {
-//                            Log.e(TAG, "Error in listener callback: " + methodName, t);
-//                            t.printStackTrace();
-//                        }
-//
-//                        return null;
-//                    }
-//                }
-//        );
-//    }
-//
-//    /**
-//     * Shows a toast notification
-//     */
-//    private static void showToast(Object animationScreen, String message) {
-//        try {
-//            Context ctx = null;
-//
-//            if (animationScreen instanceof Context) {
-//                ctx = (Context) animationScreen;
-//            }
-//
-//            if (ctx != null) {
-//                Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show();
-//            } else {
-//                Log.w(TAG, "Could not show toast - no Android Context available");
-//            }
-//        } catch (Throwable t) {
-//            Log.w(TAG, "Error showing toast", t);
-//        }
-//    }
-//}
-
