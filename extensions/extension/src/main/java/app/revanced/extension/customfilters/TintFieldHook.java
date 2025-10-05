@@ -151,8 +151,13 @@ public class TintFieldHook {
 
             Class<?> actorClass = Class.forName("com.badlogic.gdx.scenes.scene2d.Actor", false, cl);
 
-            // FIX: Use getDeclaredMethod() since registerWidget is protected
-            Method registerWidget = figureFiltersClass.getDeclaredMethod("registerWidget", actorClass, int.class);
+// FIX: Look for registerWidget in the superclass (ToolTable)
+            Class<?> toolTableClass = Class.forName(
+                    "org.fortheloss.sticknodes.animationscreen.modules.tooltables.ToolTable",
+                    false, cl
+            );
+
+            Method registerWidget = toolTableClass.getDeclaredMethod("registerWidget", actorClass, int.class);
             registerWidget.setAccessible(true); // Make protected method accessible
 
             registerWidget.invoke(table, fieldInstance, 108); // ID 108 (0x6C)
