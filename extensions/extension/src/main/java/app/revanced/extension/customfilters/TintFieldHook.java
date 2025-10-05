@@ -83,7 +83,7 @@ public class TintFieldHook {
                     false, cl
             );
             Class<?> cellClass = Class.forName(
-                    "com.badlogic.gdx.scenes.scene2d.ui.Cell",
+                    "com.badlogic.gdx.scenes.scene2d/ui/Cell",
                     false, cl
             );
 
@@ -136,7 +136,7 @@ public class TintFieldHook {
                     animationScreen,
                     labelText,       // "Tint" - localized label
                     "1.00",         // Default value
-                    5,              // inputMaxLength
+                    4,              // inputMaxLength - changed to 4 (from transparency field)
                     0.0f,           // minValue
                     1.0f,           // maxValue
                     true            // isFloat
@@ -145,12 +145,16 @@ public class TintFieldHook {
             Log.i(TAG, "✓ Field instance created");
 
             // ========================================
-            // Step 5: Register the widget with ID 108
+            // Step 5: Register the widget with ID 108 - FIXED!
             // ========================================
             Log.i(TAG, "Registering widget...");
 
             Class<?> actorClass = Class.forName("com.badlogic.gdx.scenes.scene2d.Actor", false, cl);
-            Method registerWidget = figureFiltersClass.getMethod("registerWidget", actorClass, int.class);
+
+            // FIX: Use getDeclaredMethod() since registerWidget is protected
+            Method registerWidget = figureFiltersClass.getDeclaredMethod("registerWidget", actorClass, int.class);
+            registerWidget.setAccessible(true); // Make protected method accessible
+
             registerWidget.invoke(table, fieldInstance, 108); // ID 108 (0x6C)
 
             Log.i(TAG, "✓ Widget registered with ID 108");
@@ -383,7 +387,6 @@ public class TintFieldHook {
         }
     }
 }
-
 
 
 //**
