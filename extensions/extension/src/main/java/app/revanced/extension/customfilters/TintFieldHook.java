@@ -190,28 +190,60 @@ public class TintFieldHook {
             filtersSubTableField.setAccessible(true);
             Object filtersSubTable = filtersSubTableField.get(table);
 
-// FIX: Use Actor class instead of Object for the add method
-            Method tableAdd = tableClass.getMethod("add", actorClass); // Changed Object.class to actorClass
-            Object cell = tableAdd.invoke(filtersSubTable, fieldInstance);
-
-// Configure Cell layout: colspan(2).fillX()
+// FIX: Try different method signatures for Table.add
+            Method tableAdd = null;
             try {
-                Method colspan = cellClass.getMethod("colspan", int.class);
-                Object cellAfterColspan = colspan.invoke(cell, 2);
-
-                Method fillX = cellClass.getMethod("fillX");
-                fillX.invoke(cellAfterColspan);
-
-                Log.i(TAG, "✓ Cell configured (colspan=2, fillX)");
+                // First try: add(Actor)
+                tableAdd = tableClass.getMethod("add", actorClass);
+                Log.i(TAG, "✓ Found Table.add(Actor) method");
             } catch (NoSuchMethodException e) {
-                Log.w(TAG, "Could not configure Cell layout: " + e.getMessage());
+                Log.w(TAG, "✗ Table.add(Actor) not found, trying alternatives...");
+
+                // Try: add(Actor) with getDeclaredMethod
+                try {
+                    tableAdd = tableClass.getDeclaredMethod("add", actorClass);
+                    tableAdd.setAccessible(true);
+                    Log.i(TAG, "✓ Found Table.add(Actor) via getDeclaredMethod");
+                } catch (NoSuchMethodException e2) {
+                    Log.w(TAG, "✗ Table.add(Actor) not found with getDeclaredMethod");
+
+                    // Last resort: Try to find any add method that takes one parameter
+                    Method[] methods = tableClass.getMethods();
+                    for (Method method : methods) {
+                        if (method.getName().equals("add") && method.getParameterTypes().length == 1) {
+                            tableAdd = method;
+                            Log.i(TAG, "✓ Found compatible Table.add method: " + method);
+                            break;
+                        }
+                    }
+                }
             }
 
-// Add row separator
-            Method tableRow = tableClass.getMethod("row");
-            tableRow.invoke(filtersSubTable);
+            if (tableAdd != null) {
+                Object cell = tableAdd.invoke(filtersSubTable, fieldInstance);
+                Log.i(TAG, "✓ Field added to table, got cell: " + (cell != null ? cell.getClass().getSimpleName() : "null"));
 
-            Log.i(TAG, "✓ Added to filters table");
+                // Configure Cell layout: colspan(2).fillX()
+                try {
+                    Method colspan = cellClass.getMethod("colspan", int.class);
+                    Object cellAfterColspan = colspan.invoke(cell, 2);
+
+                    Method fillX = cellClass.getMethod("fillX");
+                    fillX.invoke(cellAfterColspan);
+
+                    Log.i(TAG, "✓ Cell configured (colspan=2, fillX)");
+                } catch (NoSuchMethodException e) {
+                    Log.w(TAG, "Could not configure Cell layout: " + e.getMessage());
+                }
+
+                // Add row separator
+                Method tableRow = tableClass.getMethod("row");
+                tableRow.invoke(filtersSubTable);
+
+                Log.i(TAG, "✓ Added to filters table");
+            } else {
+                throw new NoSuchMethodException("Could not find Table.add method with any signature");
+            }
 
             // ========================================
             // Step 8: Create and set field listener
