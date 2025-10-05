@@ -10,10 +10,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Field;
 
-/**
- * Schedule a safe install after initialization.
- * Call this from your smali injection.
- */
+
+
+
 public class TintFieldHook {
     private static final String TAG = "CustomFilterHook";
     private static boolean installed = false;
@@ -27,14 +26,8 @@ public class TintFieldHook {
         installed = true;
 
         // Ensure this runs on the main thread after a short delay
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            try {
-                installTintField(toolTable);
-            } catch (Throwable t) {
-                Log.e(TAG, "scheduled install failed", t);
-            }
-        }, 300); // 300ms delay gives initialize() time to finish
-    }
+        new Handler(Looper.getMainLooper()).postDelayed(() -> installTintField(toolTable), 500);
+    } // <-- close scheduleInstall here
 
     /**
      * Main hook: safely introspect the toolTable.
@@ -51,10 +44,12 @@ public class TintFieldHook {
             // Example: safely list all fields
             Field[] fields = toolTable.getClass().getDeclaredFields();
             for (Field f : fields) {
-                f.setAccessible(true);
-                Object value = null;
-                try { value = f.get(toolTable); } catch (Throwable ignored) {}
-                Log.i(TAG, "Field: " + f.getName() + " | Type: " + f.getType().getSimpleName() + " | Value: " + value);
+                try {
+                    f.setAccessible(true);
+                    Log.i(TAG, "Field: " + f.getName() + " | Type: " + f.getType().getSimpleName() + " | Value: " + f.get(toolTable));
+                } catch (Throwable t) {
+                    Log.w(TAG, "Could not read field: " + f.getName(), t);
+                }
             }
 
             // Example: safely call a method (if exists)
@@ -67,7 +62,6 @@ public class TintFieldHook {
             }
 
             // === INSERT CUSTOM FILTER SLOT LOGIC BELOW ===
-            // At this point you can add your UI components / custom slot safely
             Log.i(TAG, "Custom filter hook ready for adding filter slot!");
 
         } catch (Throwable e) {
