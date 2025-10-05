@@ -47,7 +47,7 @@ val AddCustomFilterSlot = bytecodePatch(
         targetMethod.addInstruction(
             insertIndex,
             """
-        invoke-static/range {p0 .. p0}, Lapp/revanced/extension/customfilters/TintFieldHook;->scheduleInstall(Ljava/lang/Object;)V
+        invoke-static {p0}, Lapp/revanced/extension/customfilters/TintFieldHook;->scheduleInstall(Ljava/lang/Object;)V
         """.trimIndent()
         )
 

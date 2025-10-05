@@ -10,72 +10,68 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Field;
 
+/**
+ * Schedule a safe install after initialization.
+ * Call this from your smali injection.
+ */
 public class TintFieldHook {
     private static final String TAG = "CustomFilterHook";
+    private static boolean installed = false;
 
-    // Simple ping to check injection
-    public static void ping(Object toolTable) {
-        try {
-            Log.i(TAG, "ping() called. toolTable class: " + (toolTable != null ? toolTable.getClass().getName() : "null"));
-        } catch (Throwable t) {
-            Log.e(TAG, "ping() error", t);
-        }
-    }
-
-    // schedule the real install a little later on the main thread
+    /**
+     * Schedule a safe install after initialization.
+     * Call this from your smali injection.
+     */
     public static void scheduleInstall(final Object toolTable) {
-        try {
-            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        installTintField(toolTable);
-                    } catch (Throwable t) {
-                        Log.e(TAG, "scheduled install failed", t);
-                    }
-                }
-            }, 200); // 200 ms delay
-        } catch (Throwable t) {
-            Log.e(TAG, "scheduleInstall failed", t);
-        }
+        if (installed) return; // Only run once
+        installed = true;
+
+        // Ensure this runs on the main thread after a short delay
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            try {
+                installTintField(toolTable);
+            } catch (Throwable t) {
+                Log.e(TAG, "scheduled install failed", t);
+            }
+        }, 300); // 300ms delay gives initialize() time to finish
     }
 
-    // do minimal, defensive reflection/UI code here
-    public static void installTintField(Object table) {
+    /**
+     * Main hook: safely introspect the toolTable.
+     */
+    public static void installTintField(Object toolTable) {
+        if (toolTable == null) {
+            Log.w(TAG, "toolTable is null, aborting hook");
+            return;
+        }
+
         try {
-            // defensive: attempt to find context safely
-            Object contextObj = null;
+            Log.i(TAG, "installTintField() invoked; table class: " + toolTable.getClass().getName());
+
+            // Example: safely list all fields
+            Field[] fields = toolTable.getClass().getDeclaredFields();
+            for (Field f : fields) {
+                f.setAccessible(true);
+                Object value = null;
+                try { value = f.get(toolTable); } catch (Throwable ignored) {}
+                Log.i(TAG, "Field: " + f.getName() + " | Type: " + f.getType().getSimpleName() + " | Value: " + value);
+            }
+
+            // Example: safely call a method (if exists)
             try {
-                // In a lot of these classes getModule().getContext() is the path; adapt as needed
-                java.lang.reflect.Method getModule = table.getClass().getMethod("getModule");
-                Object module = getModule.invoke(table);
-                java.lang.reflect.Method getContext = module.getClass().getMethod("getContext");
-                contextObj = getContext.invoke(module);
-            } catch (Throwable inner) {
-                Log.w(TAG, "couldn't get context via getModule/getContext", inner);
+                Method getContext = toolTable.getClass().getMethod("getContext");
+                Object context = getContext.invoke(toolTable);
+                Log.i(TAG, "Retrieved context: " + context);
+            } catch (Throwable e) {
+                Log.w(TAG, "getContext() method not available", e);
             }
 
-            // fallback: try table.getContext()
-            if (contextObj == null) {
-                try {
-                    java.lang.reflect.Method getContext2 = table.getClass().getMethod("getContext");
-                    contextObj = getContext2.invoke(table);
-                } catch (Throwable ignored) {}
-            }
+            // === INSERT CUSTOM FILTER SLOT LOGIC BELOW ===
+            // At this point you can add your UI components / custom slot safely
+            Log.i(TAG, "Custom filter hook ready for adding filter slot!");
 
-            Context context = (contextObj instanceof Context) ? (Context) contextObj : null;
-
-            // Show a toast safely on main thread if we have a context
-            if (context != null) {
-                final Context ctx = context;
-                new Handler(Looper.getMainLooper()).post(() ->
-                        Toast.makeText(ctx, "✅ Custom filter slot installed", Toast.LENGTH_SHORT).show()
-                );
-            }
-
-            Log.i(TAG, "installTintField() finished; table class: " + (table != null ? table.getClass().getName() : "null"));
-        } catch (Throwable t) {
-            Log.e(TAG, "installTintField failed", t);
+        } catch (Throwable e) {
+            Log.e(TAG, "installTintField failed", e);
         }
     }
 }
