@@ -1,3 +1,10 @@
+# [1.29.0](https://github.com/HZbutcoding/sn-patching/compare/v1.28.0...v1.29.0) (2025-10-05)
+
+
+### Features
+
+* working visuals, re-adjusting ([38ad180](https://github.com/HZbutcoding/sn-patching/commit/38ad18011bb12e3b25a911103f7a03a6641fab76))
+
 # [1.28.0](https://github.com/HZbutcoding/sn-patching/compare/v1.27.0...v1.28.0) (2025-10-05)
 
 
