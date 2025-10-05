@@ -1,3 +1,10 @@
+# [1.25.0](https://github.com/HZbutcoding/sn-patching/compare/v1.24.0...v1.25.0) (2025-10-05)
+
+
+### Features
+
+* typo ([16b3e59](https://github.com/HZbutcoding/sn-patching/commit/16b3e5911fdd289e81dfa1a70f0f369eceebdaa8))
+
 # [1.24.0](https://github.com/HZbutcoding/sn-patching/compare/v1.23.0...v1.24.0) (2025-10-05)
 
 
