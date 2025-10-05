@@ -1,3 +1,10 @@
+# [1.27.0](https://github.com/HZbutcoding/sn-patching/compare/v1.26.0...v1.27.0) (2025-10-05)
+
+
+### Features
+
+* f ([bb80cb4](https://github.com/HZbutcoding/sn-patching/commit/bb80cb491d1bb5a7fdf8ae98d6888eb73e5baf77))
+
 # [1.26.0](https://github.com/HZbutcoding/sn-patching/compare/v1.25.0...v1.26.0) (2025-10-05)
 
 
