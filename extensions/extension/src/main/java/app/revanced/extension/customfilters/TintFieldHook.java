@@ -190,11 +190,11 @@ public class TintFieldHook {
             filtersSubTableField.setAccessible(true);
             Object filtersSubTable = filtersSubTableField.get(table);
 
-            // Add to table and get Cell
-            Method tableAdd = tableClass.getMethod("add", Object.class);
+// FIX: Use Actor class instead of Object for the add method
+            Method tableAdd = tableClass.getMethod("add", actorClass); // Changed Object.class to actorClass
             Object cell = tableAdd.invoke(filtersSubTable, fieldInstance);
 
-            // Configure Cell layout: colspan(2).fillX()
+// Configure Cell layout: colspan(2).fillX()
             try {
                 Method colspan = cellClass.getMethod("colspan", int.class);
                 Object cellAfterColspan = colspan.invoke(cell, 2);
@@ -207,7 +207,7 @@ public class TintFieldHook {
                 Log.w(TAG, "Could not configure Cell layout: " + e.getMessage());
             }
 
-            // Add row separator
+// Add row separator
             Method tableRow = tableClass.getMethod("row");
             tableRow.invoke(filtersSubTable);
 
