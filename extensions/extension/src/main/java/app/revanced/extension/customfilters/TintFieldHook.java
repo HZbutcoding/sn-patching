@@ -155,10 +155,19 @@ public class TintFieldHook {
             // ========================================
             Log.i(TAG, "Registering widget...");
 
-            Method registerWidget = figureFiltersClass.getMethod("registerWidget", Object.class, int.class);
-            registerWidget.invoke(table, fieldInstance, 108); // ID 108 (0x6C)
+            try {
+                // Load the Actor class
+                Class<?> actorClass = Class.forName("com.badlogic.gdx.scenes.scene2d.Actor", false, cl);
 
-            Log.i(TAG, "✓ Widget registered with ID 108");
+                // Get the correct registerWidget method signature
+                Method registerWidget = figureFiltersClass.getMethod("registerWidget", actorClass, int.class);
+                registerWidget.invoke(table, fieldInstance, 108); // ID 108 (0x6C)
+
+                Log.i(TAG, "✓ Widget registered with ID 108");
+            } catch (Exception e) {
+                Log.e(TAG, "✗ Failed to register widget", e);
+                throw e; // Re-throw to see the exact error
+            }
 
             // ========================================
             // Step 6: Configure field properties
