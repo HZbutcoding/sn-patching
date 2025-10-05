@@ -30,27 +30,27 @@ val AddCustomFilterSlot = bytecodePatch(
         val targetMethod = figureFiltersInitFingerprint.method
             ?: throw RuntimeException("Could not find FigureFiltersToolTable.initialize()")
 
-        val matchindex = figureFiltersInitFingerprint.patternMatch!!.startIndex;
-
-        val impl = targetMethod.implementation ?: throw RuntimeException("No implementation found")
-        val registerCount = impl.registerCount
-        val parameterCount = targetMethod.parameterTypes.size + 1 // +1 for "this"
-        val thisRegister = registerCount - parameterCount // vXX that represents "this"
+        val impl = targetMethod.implementation
+            ?: throw RuntimeException("Method implementation is null")
 
         println("Matched method: ${targetMethod.name}")
-        println("Registers in ${targetMethod.name}: $registerCount")
-        println("Resolved 'this' (p0) as v$thisRegister")
+        println("Registers in ${targetMethod.name}: ${impl.registerCount}")
 
-        // inject using resolved vXX instead of p0
+        // try to find the first "move-object ... p0" instruction in the method
+        val instrs = impl.instructions
+        val moveP0Index = instrs.indexOfFirst { it.toString().contains("p0") && it.toString().contains("move-object") }
+
+        val insertIndex = if (moveP0Index >= 0) moveP0Index + 1 else 1   // fallback to 1 (not 0)
+        println("Inserting at index $insertIndex (moveP0Index=$moveP0Index)")
+
+        // Use range invoke so high regs are accepted
         targetMethod.addInstruction(
-            matchindex + 201,
+            insertIndex,
             """
-        # copy 'this' into a low-numbered register
-        move-object v0, p0
-        invoke-static {v0}, Lapp/revanced/extension/customfilters/TintFieldHook;->installTintField(Ljava/lang/Object;)V
+        invoke-static/range {p0 .. p0}, Lapp/revanced/extension/customfilters/TintFieldHook;->scheduleInstall(Ljava/lang/Object;)V
         """.trimIndent()
         )
 
-        println("✅ Injection added successfully at register v$thisRegister")
+        println("Injection requested at index $insertIndex")
     }
 }
