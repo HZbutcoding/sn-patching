@@ -30,6 +30,8 @@ val AddCustomFilterSlot = bytecodePatch(
         val targetMethod = figureFiltersInitFingerprint.method
             ?: throw RuntimeException("Could not find FigureFiltersToolTable.initialize()")
 
+        val matchindex = figureFiltersInitFingerprint.patternMatch!!.startIndex;
+
         val impl = targetMethod.implementation ?: throw RuntimeException("No implementation found")
         val registerCount = impl.registerCount
         val parameterCount = targetMethod.parameterTypes.size + 1 // +1 for "this"
@@ -41,7 +43,7 @@ val AddCustomFilterSlot = bytecodePatch(
 
         // inject using resolved vXX instead of p0
         targetMethod.addInstruction(
-            0,
+            matchindex + 201,
             """
         # copy 'this' into a low-numbered register
         move-object v0, p0
