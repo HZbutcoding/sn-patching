@@ -1,3 +1,10 @@
+# [1.23.0](https://github.com/HZbutcoding/sn-patching/compare/v1.22.0...v1.23.0) (2025-10-05)
+
+
+### Features
+
+* should work ([52d0b53](https://github.com/HZbutcoding/sn-patching/commit/52d0b53244cc6e59f466a286dfeada2cf8bbd6b8))
+
 # [1.22.0](https://github.com/HZbutcoding/sn-patching/compare/v1.21.0...v1.22.0) (2025-10-05)
 
 
