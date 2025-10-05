@@ -83,7 +83,7 @@ public class TintFieldHook {
                     false, cl
             );
             Class<?> cellClass = Class.forName(
-                    "com.badlogic.gdx.scenes.scene2d/ui/Cell",
+                    "com.badlogic.gdx.scenes.scene2d.ui.Cell",
                     false, cl
             );
 
