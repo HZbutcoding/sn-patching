@@ -1,3 +1,10 @@
+# [1.17.0](https://github.com/HZbutcoding/sn-patching/compare/v1.16.0...v1.17.0) (2025-10-05)
+
+
+### Features
+
+* debugging patch ([9ee70b5](https://github.com/HZbutcoding/sn-patching/commit/9ee70b5801f23ba8c7db2fdc0b5a891d95e0066b))
+
 # [1.16.0](https://github.com/HZbutcoding/sn-patching/compare/v1.15.0...v1.16.0) (2025-10-05)
 
 
